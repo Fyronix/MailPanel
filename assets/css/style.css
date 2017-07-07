@@ -1,0 +1,12 @@
+.vertical-space{
+    margin: 50px 0;
+}
+.tab-pane.active{
+    padding: 10px;
+}
+.block{
+    display: block;
+}
+body{
+    overflow-x: hidden;
+}
