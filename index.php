@@ -9,6 +9,8 @@
         <?php
         include_once 'admin-setup/setup.php';
         include_once 'database.php';
+        $query = "create table test(id bit)";
+        $dbh->query($query);
         ?>
     </head>
     <body>
@@ -20,7 +22,9 @@
                     <div class="panel-body">
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#compose" data-toggle="tab" aria-expanded="false">Compose</a></li>
-                            <li class=""><a href="#contact" data-toggle="tab" aria-expanded="true">Contacts</a></li>
+                            <li class=""><a href="#add-contact" data-toggle="tab" aria-expanded="false">AddContact</a></li>
+                            <li class=""><a href="#contact" data-toggle="tab" aria-expanded="true">ContactsList</a></li>
+                            <li class=""><a href="#maillist" data-toggle="tab" aria-expanded="false">MailList</a></li>
                             <li class=""><a href="#configuration" data-toggle="tab" aria-expanded="false">Configuration</a></li>
                         </ul>
                         <div class="tab-content">
@@ -57,6 +61,23 @@
                                     <input class="btn btn-primary" name="send_mail" type="submit" value="Send Mail">
                                 </form>
                             </div><!--#compose-->
+                            <div id="add-contact" class="tab-pane">
+                                <form class="add-contact" action="contact-add.php" method="post">
+                                    <div class="form-group">
+                                        <label for="firstname">FirstName:</label>
+                                        <input id="firstname" name="firstname" class="form-control" placeholder="" type="text">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastname">LastName:</label>
+                                        <input id="lastname" name="lastname" class="form-control" placeholder="" type="text">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email:</label>
+                                        <input id="email" name="email" class="form-control" placeholder="" type="text">
+                                    </div>
+                                    <input type="submit" class="btn btn-primary" name="add_contact" value="Add Contact" > 
+                                </form><!--.mail-config-->
+                            </div><!--#add-contact-->
                             <div id="contact" class="tab-pane">
                                 <table class="table table-striped table-bordered table-hover">
                                     <thead>
@@ -68,14 +89,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Abolfazl</td>
-                                            <td>Sabagh</td>
-                                            <td>a.sabagh72@gmail.com</td>
-                                            <td>
-                                                <a href="#" title="edit contact">Edit</a> | <a href="#" title="remove contact">Remove</a>
-                                            </td>
-                                        </tr>
+                                        <?php
+                                        $query = "SELECT * FROM contacts";
+                                        $query_result = $dbh->query($query);
+                                        while ($row_obj = $query_result->fetchObject()) {
+                                            ?>
+                                            <tr>
+                                                <td><?php echo $row_obj->firstname; ?></td>
+                                                <td><?php echo $row_obj->lastname; ?></td>
+                                                <td><?php echo $row_obj->email; ?></td>
+                                                <td>
+                                                    <a href="contact-edit.php?id=<?php echo $row_obj->id; ?>" title="edit contact">Edit</a> | <a href="contact-delete.php?id=<?php echo $row_obj->id; ?>" title="remove contact">Remove</a>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
+                                        ?>
+
                                     </tbody>
                                 </table>
                             </div><!--#contact-->
@@ -104,6 +134,38 @@
                                     <input type="submit" class="btn btn-primary" name="save_configuration" value="Save Configuration" > 
                                 </form><!--.mail-config-->
                             </div><!--#Configuration-->
+                            <div id="maillist" class="tab-pane">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>To</th>
+                                            <th>From</th>
+                                            <th>Subject</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>info@asabagh.ir</td>
+                                            <td>a.sabagh72@gmail.com</td>
+                                            <td>new project on github</td>
+                                            <td><a href="#" title="show mail detail">ShowMore</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>info@asabagh.ir</td>
+                                            <td>a.sabagh72@gmail.com</td>
+                                            <td>new project on github</td>
+                                            <td><a href="#" title="show mail detail">ShowMore</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>info@asabagh.ir</td>
+                                            <td>a.sabagh72@gmail.com</td>
+                                            <td>new project on github</td>
+                                            <td><a href="#" title="show mail detail">ShowMore</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div><!--.maillist-->
                         </div><!--.tab-content-->
                     </div><!--.panel-body-->
                 </div><!--.panel-body-->

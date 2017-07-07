@@ -3,7 +3,7 @@ $filename = "config.php";
 if(file_exists($filename)){
     include_once 'config.php';
     $dbh = new PDO("mysql:host=" . HOST . ";dbname=" . DB , USER , PASSWORD);
-    $configuration = "CREATE TABLE configuration("
+    $configuration = "CREATE TABLE IF NOT EXISTS configuration("
             . "id INT(1) NOT NULL AUTO_INCREMENT,"
             . "host VARCHAR(128) NOT NULL,"
             . "port INT(4) NOT NULL,"
@@ -12,7 +12,15 @@ if(file_exists($filename)){
             . "PRIMARY KEY(id)"
             . ")";
     $dbh->query($configuration);
-    $mails = "CREATE TABLE mails("
+    $contacts = "CREATE TABLE IF NOT EXISTS contacts("
+            . "id INT(3) NOT NULL AUTO_INCREMENT,"
+            . "firstname VARCHAR(32) NOT NULL,"
+            . "lastname VARCHAR(32) NOT NULL,"
+            . "email VARCHAR(32) NOT NULL,"
+            . "PRIMARY KEY(id)"
+            . ")";
+    $dbh->query($contacts);
+    $mails = "CREATE TABLE IF NOT EXISTS mails("
             . "id INT(4) NOT NULL AUTO_INCREMENT,"
             . "mail_to VARCHAR(128) NOT NULL,"
             . "mail_from VARCHAR(128) DEFAULT NULL,"
@@ -38,4 +46,5 @@ if(file_exists($filename)){
     header("Location: setup-user.php");
 }else{
     echo 'configuration is not successfully';
+    header("Location: index.php");
 }
