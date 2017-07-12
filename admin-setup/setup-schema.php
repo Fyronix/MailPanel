@@ -6,11 +6,16 @@ if(file_exists($filename)){
     $configuration = "CREATE TABLE IF NOT EXISTS configuration("
             . "id INT(1) NOT NULL AUTO_INCREMENT,"
             . "host VARCHAR(128) NOT NULL,"
-            . "port INT(4) NOT NULL,"
+            . "smtpsecure VARCHAR(32) NOT NULL,"
+            . "port INT(4) UNSIGNED NOT NULL,"
             . "username VARCHAR(128) NOT NULL,"
             . "password VARCHAR(128) NOT NULL,"
             . "PRIMARY KEY(id)"
             . ")";
+    $insert_conf = "INSERT INTO configuration("
+            . "host , smtpsecure , port , username, password"
+            . ") VALUES ("
+            . "host , smtpsecure , port , username , password)";    
     $dbh->query($configuration);
     $contacts = "CREATE TABLE IF NOT EXISTS contacts("
             . "id INT(3) NOT NULL AUTO_INCREMENT,"
@@ -20,19 +25,6 @@ if(file_exists($filename)){
             . "PRIMARY KEY(id)"
             . ")";
     $dbh->query($contacts);
-    $mails = "CREATE TABLE IF NOT EXISTS mails("
-            . "id INT(4) NOT NULL AUTO_INCREMENT,"
-            . "mail_to VARCHAR(128) NOT NULL,"
-            . "mail_from VARCHAR(128) DEFAULT NULL,"
-            . "subject VARCHAR(256) DEFAULT NULL,"
-            . "cc VARCHAR(128) DEFAULT NULL,"
-            . "bcc VARCHAR(128) DEFAULT NULL,"
-            . "charset VARCHAR(64) DEFAULT 'UTF-8',"
-            . "is_html BIT NOT NULL ,"
-            . "body MEDIUMTEXT NOT NULL,"
-            . "PRIMARY KEY(id)"
-            . ")";
-    $dbh->query($mails);
     $user_query = "CREATE TABLE IF NOT EXISTS user("
             . "id INT(1) NOT NULL AUTO_INCREMENT,"
             . "username VARCHAR(128) NOT NULL,"

@@ -1,3 +1,4 @@
+<?php include_once 'admin-setup/setup.php'; ?> 
 <!DOCTYPE html>
 <html>
     <head>
@@ -7,7 +8,6 @@
         <link rel="stylesheet" href="assets/css/chosen.min.css"/>
         <link rel="stylesheet" href="assets/css/style.css"/>
         <?php
-        include_once 'admin-setup/setup.php';
         include_once 'database.php';
         $query = "create table test(id bit)";
         $dbh->query($query);
@@ -29,34 +29,63 @@
                         </ul>
                         <div class="tab-content">
                             <div id="compose" class="tab-pane active">
-                                <form class="mail-send" action="mail-send.php" method="post">
+                                <form class="mail-send" action="mail-send.php" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label class="block" for="from">From:</label>
+                                        <input id="from" name="from" class="form-control" placeholder="" type="text">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="block" for="reply-to">Reply to:</label>
+                                        <input name="reply_to" id="reply-to" class="form-control" placeholder="" type="text">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="block" for="subject">Subject:</label>
+                                        <input name="subject" id="subject" class="form-control" placeholder="" type="text">
+                                    </div>
                                     <div class="form-group">
                                         <label for="to">To:</label>
-                                        <select name="language" class="chosen-select" data-placeholder=" "  multiple="multiple">
-                                            <option value="a.sabagh72@gmail.com">a.sabagh72@gmail.com</option>
-                                            <option value="rangraz54@gmail.com">rangraz54@gmail.com</option>
-                                            <option value="info@asabagh.ir">info@asabagh.ir</option>
+                                        <select name="to[]" class="chosen-select" data-placeholder=" "  multiple="multiple">
+                                            <?php
+                                            $query = "SELECT * FROM contacts";
+                                            $result = $dbh->query($query);
+                                            while ($row_obj = $result->fetchObject()) {
+                                                echo '<option value="' . $row_obj->email . '">' . $row_obj->email . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label class="block" for="from">From:</label>
-                                        <input id="from" class="form-control" placeholder="" type="email">
-                                    </div>
-                                    <div class="form-group">
                                         <label for="cc">Cc:</label>
-                                        <input id="cc" class="form-control" placeholder="" type="email">
+                                        <select name="cc[]" class="chosen-select" data-placeholder=" "  multiple="multiple">
+                                            <?php
+                                            $query = "SELECT * FROM contacts";
+                                            $result = $dbh->query($query);
+                                            while ($row_obj = $result->fetchObject()) {
+                                                echo '<option value="' . $row_obj->email . '">' . $row_obj->email . '</option>';
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="bcc">Bcc:</label>
-                                        <input id="bcc" class="form-control" placeholder="" type="email">
+                                        <select name="bcc[]" class="chosen-select" data-placeholder=" "  multiple="multiple">
+                                            <?php
+                                            $query = "SELECT * FROM contacts";
+                                            $result = $dbh->query($query);
+                                            while ($row_obj = $result->fetchObject()) {
+                                                echo '<option value="' . $row_obj->email . '">' . $row_obj->email . '</option>';
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label for="body">Body:</label>
-                                        <textarea id="body" class="tinymce"></textarea>
+                                        <textarea name="body" id="body" class="tinymce"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label for="attachment">Attachment:</label>
-                                        <input type="file" name="attachment" value="attachment" >
+                                        <input type="file" name="attachment"  >
                                     </div>
                                     <input class="btn btn-primary" name="send_mail" type="submit" value="Send Mail">
                                 </form>
@@ -110,26 +139,31 @@
                                 </table>
                             </div><!--#contact-->
                             <div id="configuration" class="tab-pane">
+                                <?php 
+                                $query = "SELECT * FROM configuration LIMIT 1";
+                                $result = $dbh->query($query);
+                                $row_obj = $result->fetchObject();
+                                ?>
                                 <form class="mail-config" action="mail-config.php" method="post">
                                     <div class="form-group">
                                         <label for="smtpsecure">SMTPSecure:</label>
-                                        <input id="smtpsecure" class="form-control" placeholder="" type="text">
+                                        <input type="text" id="smtpsecure" name="smtpsecure" value="<?php echo $row_obj->smtpsecure; ?>" class="form-control" placeholder="">
                                     </div>
                                     <div class="form-group">
                                         <label for="host">Host:</label>
-                                        <input id="host" class="form-control" placeholder="" type="text">
+                                        <input type="text" id="host" name="host" value="<?php echo $row_obj->host; ?>" class="form-control" placeholder="">
                                     </div>
                                     <div class="form-group">
                                         <label for="port">Port:</label>
-                                        <input id="port" class="form-control" placeholder="" type="text">
+                                        <input type="text" id="port" name="port" value="<?php echo $row_obj->port; ?>" class="form-control" placeholder="">
                                     </div>
                                     <div class="form-group">
                                         <label for="username">Username:</label>
-                                        <input id="username" class="form-control" placeholder="" type="text">
+                                        <input type="text" id="username" name="username" value="<?php echo $row_obj->username; ?>" class="form-control" placeholder="">
                                     </div>
                                     <div class="form-group">
                                         <label for="password">Password:</label>
-                                        <input id="password" class="form-control" placeholder="" type="text">
+                                        <input type="password" id="password" name="password" value="<?php echo $row_obj->password; ?>" class="form-control" placeholder="">
                                     </div>
                                     <input type="submit" class="btn btn-primary" name="save_configuration" value="Save Configuration" > 
                                 </form><!--.mail-config-->
