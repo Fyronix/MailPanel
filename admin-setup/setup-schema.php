@@ -6,16 +6,13 @@ if(file_exists($filename)){
     $configuration = "CREATE TABLE IF NOT EXISTS configuration("
             . "id INT(1) NOT NULL AUTO_INCREMENT,"
             . "host VARCHAR(128) NOT NULL,"
+			. "imap_path VARCHAR(128) NOT NULL,"
             . "smtpsecure VARCHAR(32) NOT NULL,"
             . "port INT(4) UNSIGNED NOT NULL,"
             . "username VARCHAR(128) NOT NULL,"
             . "password VARCHAR(128) NOT NULL,"
             . "PRIMARY KEY(id)"
             . ")";
-    $insert_conf = "INSERT INTO configuration("
-            . "host , smtpsecure , port , username, password"
-            . ") VALUES ("
-            . "host , smtpsecure , port , username , password)";    
     $dbh->query($configuration);
     $contacts = "CREATE TABLE IF NOT EXISTS contacts("
             . "id INT(3) NOT NULL AUTO_INCREMENT,"
@@ -35,7 +32,7 @@ if(file_exists($filename)){
             . "PRIMARY KEY (id)"
             . ")";
     $dbh->query($user_query);
-    header("Location: setup-user.php");
+    header("Location: setup-mail.php");
 }else{
     echo 'configuration is not successfully';
     header("Location: index.php");
