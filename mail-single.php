@@ -1,3 +1,5 @@
+<?php include_once 'admin-setup/setup.php'; ?> 
+<?php if(isset($_GET['message_id'])){?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -6,10 +8,7 @@
         <link rel="stylesheet" href="assets/css/bootstrap-theme.min.css"/>
         <link rel="stylesheet" href="assets/css/chosen.min.css"/>
         <link rel="stylesheet" href="assets/css/style.css"/>
-        <?php
-        include_once 'admin-setup/setup.php';
-        include_once 'database.php';
-        ?>
+        <?php include_once 'database.php'; ?>
     </head>
     <body>
         <div class="vertical-space"></div>
@@ -18,18 +17,35 @@
                 <div class="panel panel-info">
                     <div class="panel-heading"><b>Mail Panel</b></div><!--.panel-heading-->
                     <div class="panel-body">
-                        <h3>To:</h3>
-                        <p>info@asabagh.ir</p>
-                        <h3>From:</h3>
-                        <p>a.sabagh72@gmail.com</p>
-                        <h3>Cc</h3>
-                        <p>rangraz54@gmail.com , rangraz_user@yahoo.com , aligh@gmail.com</p>
-                        <h3>Bcc:</h3>
-                        <p>ashoori_mahdi@gmail.com</p>
-                        <h3>Subject:</h3>
-                        <p>new project on github</p>
-                        <h3>Body:</h3>
-                        <p>lorem ipsume dolor script on github and quick install with simple admin panel create with bootstrap</p>
+						<?php
+						$query = "SELECT * FROM configuration LIMIT 1";
+						$result = $dbh->query($query);
+						$row_obj = $result->fetchObject();
+						$imapPath = "{server1.ariazdevs.com:993/imap/ssl}INBOX";
+						$username = $row_obj->username;
+						$password = $row_obj->password; 
+						$inbox = imap_open($imapPath , $username , $password);
+						$emails = imap_search($inbox , "ALL");
+						$message_id = $_GET['message_id'];
+						foreach($emails as $key=>$email){
+							$header_info = imap_headerinfo($inbox , $email);
+							if($header_info->message_id == $message_id){
+						?>
+								<h3>toAddress:</h3>
+								<p><?php echo $header_info->toaddress; ?></p>
+								<h3>fromAddress:</h3>
+								<p><?php echo $header_info->fromaddress; ?></p>
+								<h3>Subject:</h3>
+								<p><?php echo $header_info->subject; ?></p>
+								<h3>BodyText:</h3>
+								<?php 
+								$mail_body = imap_fetchbody($inbox, $email , 1);
+								?>
+								<p class="body-message"><?php echo $mail_body; ?></p>
+						<?php
+							}
+						}
+						?>
                         <a href="index.php" class="btn btn-info btn-block" >Back To Home</a>
                     </div><!--.panel-body-->
                 </div><!--.panel-body-->
@@ -42,4 +58,8 @@
         <script src="assets/js/scripts.js"></script>
     </body>
 </html>
-
+<?php
+}else{
+	header("Location: index.php");
+}
+?>
