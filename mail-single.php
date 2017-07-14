@@ -21,7 +21,7 @@
 						$query = "SELECT * FROM configuration LIMIT 1";
 						$result = $dbh->query($query);
 						$row_obj = $result->fetchObject();
-						$imapPath = "{server1.ariazdevs.com:993/imap/ssl}INBOX";
+						$imapPath = $row_obj->imap_path;
 						$username = $row_obj->username;
 						$password = $row_obj->password; 
 						$inbox = imap_open($imapPath , $username , $password);

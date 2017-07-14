@@ -4,7 +4,7 @@ if (isset($_POST['send_mail'])) {
     include_once 'includes/class.phpmailer.php';
     include_once 'includes/class.smtp.php';
     include_once 'database.php';
-    $query = "SELECT * FROM configuration LIMIT 1";
+    $query = "SELECT * FROM configuration";
     $result = $dbh->query($query);
     $row_obj = $result->fetchObject();
     $host = $row_obj->host;
