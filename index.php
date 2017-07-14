@@ -8,12 +8,14 @@
         <link rel="stylesheet" href="assets/css/chosen.min.css"/>
         <link rel="stylesheet" href="assets/css/style.css"/>
         <?php
-        include_once 'database.php';
-        $query = "create table test(id bit)";
-        $dbh->query($query);
-        ?>
+		include_once 'database.php';
+		include_once 'login/login.php';
+		?>
     </head>
     <body>
+	<?php
+	if(is_user_login()){
+	?>
         <div class="vertical-space"></div>
         <div class="row">
             <div class="container">
@@ -21,13 +23,48 @@
                     <div class="panel-heading"><b>Mail Panel</b></div><!--.panel-heading-->
                     <div class="panel-body">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="#compose" data-toggle="tab" aria-expanded="false">Compose</a></li>
+							<li class="active"><a href="#compose" data-toggle="tab" aria-expanded="false">Compose</a></li>
+                            <li class=""><a href="#maillist" data-toggle="tab" aria-expanded="false">Inbox</a></li>
                             <li class=""><a href="#add-contact" data-toggle="tab" aria-expanded="false">AddContact</a></li>
                             <li class=""><a href="#contact" data-toggle="tab" aria-expanded="true">ContactsList</a></li>
-                            <li class=""><a href="#maillist" data-toggle="tab" aria-expanded="false">MailList</a></li>
                             <li class=""><a href="#configuration" data-toggle="tab" aria-expanded="false">Configuration</a></li>
                         </ul>
                         <div class="tab-content">
+                            <div id="maillist" class="tab-pane">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>From</th>
+                                            <th>Date</th>
+											<th>Size</th>
+											<th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+									<?php
+									$query = "SELECT * FROM configuration LIMIT 1";
+									$result = $dbh->query($query);
+									$row_obj = $result->fetchObject();
+									$imapPath = "{server1.ariazdevs.com:993/imap/ssl}INBOX";
+									$username = $row_obj->username;
+									$password = $row_obj->password; 
+									$inbox = imap_open($imapPath , $username , $password);
+									$emails = imap_search($inbox , "ALL");
+									foreach($emails as $key=>$email){
+										$header_info = imap_headerinfo($inbox , $email);
+									?>
+                                        <tr>
+                                            <td><?php echo $header_info->subject; ?></td>
+											<td><?php echo $header_info->fromaddress; ?></td>
+											<td><?php echo $header_info->date; ?></td>
+											<td><?php echo $header_info->Size . " Byte"; ?></td>
+											<td><a href="mail-single.php?message_id=<?php echo $header_info->message_id; ?>" title="SeeMail" >Mail Details</a></td>
+                                        </tr>
+									<?php } ?>
+                                    </tbody>
+                                </table>
+                            </div><!--.maillist-->
                             <div id="compose" class="tab-pane active">
                                 <form class="mail-send" action="mail-send.php" method="post" enctype="multipart/form-data">
                                     <div class="form-group">
@@ -154,6 +191,10 @@
                                         <input type="text" id="host" name="host" value="<?php echo $row_obj->host; ?>" class="form-control" placeholder="">
                                     </div>
                                     <div class="form-group">
+                                        <label for="impat-path">IMAP Path:</label>
+                                        <input type="text" id="impat-path" name="imap_path" value="<?php echo $row_obj->imap_path; ?>" class="form-control" placeholder="">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="port">Port:</label>
                                         <input type="text" id="port" name="port" value="<?php echo $row_obj->port; ?>" class="form-control" placeholder="">
                                     </div>
@@ -168,43 +209,38 @@
                                     <input type="submit" class="btn btn-primary" name="save_configuration" value="Save Configuration" > 
                                 </form><!--.mail-config-->
                             </div><!--#Configuration-->
-                            <div id="maillist" class="tab-pane">
-                                <table class="table table-condensed">
-                                    <thead>
-                                        <tr>
-                                            <th>To</th>
-                                            <th>From</th>
-                                            <th>Subject</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>info@asabagh.ir</td>
-                                            <td>a.sabagh72@gmail.com</td>
-                                            <td>new project on github</td>
-                                            <td><a href="#" title="show mail detail">ShowMore</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>info@asabagh.ir</td>
-                                            <td>a.sabagh72@gmail.com</td>
-                                            <td>new project on github</td>
-                                            <td><a href="#" title="show mail detail">ShowMore</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>info@asabagh.ir</td>
-                                            <td>a.sabagh72@gmail.com</td>
-                                            <td>new project on github</td>
-                                            <td><a href="#" title="show mail detail">ShowMore</a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div><!--.maillist-->
+
                         </div><!--.tab-content-->
                     </div><!--.panel-body-->
                 </div><!--.panel-body-->
             </div><!--.container-->
         </div><!--.row-->
+	<?php
+	}else{
+	?>
+        <div class="vertical-space"><br></div>
+		<div class="row login">
+            <div class="col-md-4 hidden-sm"></div>
+            <div class="col-md-4">
+                <form action="login.php" method="post">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>Login</b><span class="login-msg"><?php ?></span></div><!--.panel-header-->
+                        <div class="panel-body">
+                            <div class="form-group"><input type="text" name="username" class="form-control" placeholder="username"></div>
+                            <div class="form-group"><input type="password" name="password" class="form-control" placeholder="password"></div>
+                            <label><input type="checkbox" name="remember" class="remember" > Remember me</label>
+                        </div><!--.panel-body-->
+                        <div class="panel-footer clearfix">
+                            <input class="btn btn-default pull-right" type="submit" name="login" value="Login">
+                        </div><!--.panel-footer-->
+                    </div><!--.panel-default-->
+                </form>
+            </div>
+            <div class="col-mx-4 hidden-sm"></div>
+        </div><!--.login-->
+	<?php	
+	}
+	?>
         <script src="assets/js/jquery-3.2.1.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
         <script src="assets/js/chosen.jquery.min.js"></script>
